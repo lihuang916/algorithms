@@ -1,5 +1,9 @@
-all:  
-	g++ -c myList.cpp -o myList.o -std=c++11
-#	./test
+all: clear myList.o test.o
+	g++ test.o myList.o -o test -g 
+	./test
+myList.o:  
+	g++ -c myList.cpp -o myList.o -std=c++11 -g -Wall
+test.o:
+	g++ -c test.cpp -o test.o -std=c++11 -g -Wall
 clear:
 	rm -rf *o

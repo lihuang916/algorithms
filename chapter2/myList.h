@@ -2,47 +2,57 @@
  * Linked list
  */
 
+#ifndef MYLIST_H
+#define MYLIST_H
+
 struct Node {
-  int data;
-  Node* next;
+    int data;
+    Node* next;
 };
 
 class MyList {
- public:
-  MyList();
-  MyList(const MyList& list); 
-  MyList(int data, unsigned int len);
-  ~MyList();
-  
-  unsigned int size() const;
-  
-  int getAt(unsigned int index) const;
+  public:
+    MyList();
 
-  void pushFront(int data);
+    MyList(const MyList& list); 
 
-  void pushBack(int data);
+    MyList(int data, size_t len);
 
-  int popFront();
+    ~MyList();
 
-  int popBack();
+    size_t size() const;
 
-  void insertAt(unsigned int index);
-  
-  void removeAt(unsigned int index);
+    bool isEmpty() const;
 
-  MyList rmDup();
+    int getAt(size_t index) const;
 
-  void sort(bool isAscend);
-  
-  MyList subList(unsigned int pos = 0, unsigned int len = -1) const;
-  
-  bool isCircular();
+    void pushFront(int data);
 
-  Node* loopStartAt();
+    void pushBack(int data);
 
-  void printList() const;
-  
- private:
-  Node* _head;
-  unsigned int _size;
+    int popFront();
+
+    int popBack();
+
+    void insertAt(size_t index, int data);
+
+    void removeAt(size_t index);
+
+    MyList rmDup();
+
+    void sort(bool isAscend);
+
+    MyList subList(size_t pos = 0, size_t len = -1) const;
+
+    bool isCircular();
+
+    Node* loopStartAt();
+
+    void printList() const;
+      
+  private:
+    Node* head_;
+    int size_;
 };
+
+#endif
