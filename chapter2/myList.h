@@ -26,6 +26,8 @@ class MyList {
 
     int getAt(size_t index) const;
 
+    void setAt(size_t index, int data);
+
     void pushFront(int data);
 
     void pushBack(int data);
@@ -38,17 +40,19 @@ class MyList {
 
     void removeAt(size_t index);
 
-    MyList rmDup();
+    void rmDup();
 
-    void sort(bool isAscend);
+    void sort(bool isAscend = true);
 
     MyList subList(size_t pos = 0, size_t len = -1) const;
 
     bool isCircular();
 
-    Node* loopStartAt();
+    int loopStartAt();
 
-    void printList() const;
+    void makeCircular(size_t pos = 0);
+
+    void printList(size_t maxlen = -1) const;
       
   private:
     Node* head_;
