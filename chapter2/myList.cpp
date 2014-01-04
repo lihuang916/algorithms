@@ -303,6 +303,17 @@ void MyList::makeCircular(size_t pos) {
     tmp1->next = tmp->next; 
 }
 
+MyList MyList::operator+(const MyList& list) const {
+    int len = list.size() > size_ ? size_ : list.size();
+    MyList sumList;
+    int i;
+    for (i = 0; i < len; i++)
+        sumList.pushBack(list.getAt(i) + getAt(i));
+
+    return sumList;
+}
+
+
 void MyList::printList(size_t maxlen) const {
     if (head_->next == nullptr) {
         std::cout << "printList error: empty list!" << std::endl;

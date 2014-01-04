@@ -18,14 +18,14 @@ int main() {
     }
   
     std::cout << "list size: " << list1.size() << std::endl;
-    list1.printList(2); 
+    list1.printList(); 
 
     MyList* list2 = new MyList(list1);
     list2->sort(1);
     list2->printList();
     delete list2;
 
-    MyList list3 = list1.subList();
+    MyList list3 = list1.subList(0, 3) + list1;
     list3.printList();
 
     MyList list4(1, 2);

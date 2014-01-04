@@ -52,6 +52,8 @@ class MyList {
 
     void makeCircular(size_t pos = 0);
 
+    MyList operator+(const MyList& list) const; 
+
     void printList(size_t maxlen = -1) const;
       
   private:
