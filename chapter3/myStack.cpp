@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <cstdlib>
+#include <queue>
 #include "myStack.h"
 
 #define INITIALLEN 10
@@ -53,6 +54,17 @@ int MyStack::peek() const {
     }
 
     return arr[stackSize - 1];
+}
+
+void MyStack::sort() {
+    std::priority_queue<int, std::vector<int>, std::less<int> > pq;
+    while (!isEmpty()) 
+        pq.push(pop());
+
+    while (!pq.empty()) {
+        push(pq.top());
+        pq.pop();
+    }
 }
 
 void MyStack::printStack() const {

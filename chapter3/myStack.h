@@ -21,6 +21,8 @@ class MyStack {
 
     int peek() const;
 
+    void sort();
+
     void printStack() const;
 
   private:
