@@ -6,7 +6,7 @@
 #include <cstdlib>
 #include "myStack.h"
 
-#define INITIALLEN 32
+#define INITIALLEN 10
 
 MyStack::MyStack() {
     arr = new int[INITIALLEN];
@@ -40,13 +40,18 @@ int MyStack::pop() {
 
     int retVal = arr[stackSize - 1];
     stackSize--;
-    if (stackSize <= arrlen / 2)
+    if (arrlen > INITIALLEN && stackSize <= arrlen / 2)
         halfMem();
     
     return retVal;
 }
 
 int MyStack::peek() const {
+    if (stackSize == 0) {
+        std::cout << "peek error: stack is empty!" << std::endl;
+        exit(1);
+    }
+
     return arr[stackSize - 1];
 }
 
