@@ -6,16 +6,17 @@
 #include <cstdlib>
 #include <cstring>
 #include <set>
-#include "myList.h"
 
-MyList::MyList() {
+template <typename ElemType>
+MyList<ElemType>::MyList() {
     Node* dummy = new Node;
     dummy->next = nullptr;
     head_ = dummy;
     size_ = 0;
 }
  
-MyList::MyList(const MyList& list) {
+template <typename ElemType>
+MyList<ElemType>::MyList(const MyList<ElemType>& list) {
     Node* dummy = new Node;
     dummy->next = nullptr;
     head_ = dummy;
@@ -33,7 +34,8 @@ MyList::MyList(const MyList& list) {
     size_ = list.size();
 }
 
-MyList::MyList(int data, size_t len) {
+template <typename ElemType>
+MyList<ElemType>::MyList(ElemType data, size_t len) {
     Node* dummy = new Node;
     dummy->next = nullptr;
     head_ = dummy;
@@ -50,7 +52,8 @@ MyList::MyList(int data, size_t len) {
     size_ = len;
 }
 
-MyList::~MyList() {
+template <typename ElemType>
+MyList<ElemType>::~MyList() {
     Node* tmp = head_->next;
     int size = size_;
     while (tmp != nullptr && size > 0) {
@@ -61,15 +64,18 @@ MyList::~MyList() {
     }
 }
 
-size_t MyList::size() const {
+template <typename ElemType>
+size_t MyList<ElemType>::size() const {
     return size_;
 }
 
-bool MyList::isEmpty() const {
+template <typename ElemType>
+bool MyList<ElemType>::isEmpty() const {
     return size_ == 0;
 }
 
-int MyList::getAt(size_t index) const {
+template <typename ElemType>
+ElemType MyList<ElemType>::getAt(size_t index) const {
     if (index >= size_) {
         std::cout << "getAt error: out of range!" << std::endl;
         exit(1);
@@ -83,7 +89,8 @@ int MyList::getAt(size_t index) const {
     return tmp->next->data;
 }
 
-void MyList::setAt(size_t index, int data) {
+template <typename ElemType>
+void MyList<ElemType>::setAt(size_t index, ElemType data) {
     if (index >= size_) {
         std::cout << "setAt error: out of range!" << std::endl;
         exit(1);
@@ -97,7 +104,8 @@ void MyList::setAt(size_t index, int data) {
     tmp->next->data = data;
 }
 
-void MyList::pushFront(int data) {
+template <typename ElemType>
+void MyList<ElemType>::pushFront(ElemType data) {
     Node* newNode = new Node;
     newNode->data = data;
     newNode->next = head_->next;
@@ -105,7 +113,8 @@ void MyList::pushFront(int data) {
     size_++;
 }
 
-void MyList::pushBack(int data) {
+template <typename ElemType>
+void MyList<ElemType>::pushBack(ElemType data) {
     Node* newNode = new Node;
     newNode->data = data;
     newNode->next = nullptr;
@@ -118,7 +127,8 @@ void MyList::pushBack(int data) {
     size_++;
 }
 
-int MyList::popFront() {
+template <typename ElemType>
+ElemType MyList<ElemType>::popFront() {
     if (head_->next == nullptr) {
         std::cout << "popFront error: list is empty!" << std::endl;
         exit(1);
@@ -132,7 +142,8 @@ int MyList::popFront() {
     return retVal;
 }
 
-int MyList::popBack() {
+template <typename ElemType>
+ElemType MyList<ElemType>::popBack() {
    if (head_->next == nullptr) {
         std::cout << "popBack error: list is empty!" << std::endl;
         exit(1);
@@ -150,7 +161,8 @@ int MyList::popBack() {
     return retVal;
 }
 
-void MyList::insertAt(size_t index, int data) {
+template <typename ElemType>
+void MyList<ElemType>::insertAt(size_t index, ElemType data) {
    if (index >= size_) {
         std::cout << "insertAt error: out of range!" << std::endl;
         exit(1);
@@ -168,7 +180,8 @@ void MyList::insertAt(size_t index, int data) {
     size_++;
 }
 
-void MyList::removeAt(size_t index) {
+template <typename ElemType>
+void MyList<ElemType>::removeAt(size_t index) {
     if (index >= size_) {
         std::cout << "removeAt error: out of range!" << std::endl;
         exit(1);
@@ -185,7 +198,8 @@ void MyList::removeAt(size_t index) {
     size_--;
 }
 
-void MyList::rmDup() {
+template <typename ElemType>
+void MyList<ElemType>::rmDup() {
     /* traverse the list and keep a set of traversed, remove duplicate data */
     Node* tmp = head_;
     std::set<int> dataSet;
@@ -203,13 +217,14 @@ void MyList::rmDup() {
     }
 }
 
-void MyList::sort(bool isAscend) {
+template <typename ElemType>
+void MyList<ElemType>::sort(bool isAscend) {
     /* use selection sort to sort the list */
     Node* p = head_;
     Node* tmp;
     while (p->next != nullptr) {
         Node* mNode;
-        int m;
+        ElemType m;
         tmp = p->next;
         m = tmp->data;
         mNode = tmp;
@@ -227,14 +242,15 @@ void MyList::sort(bool isAscend) {
     }
 }
 
-MyList MyList::subList(size_t pos, size_t len) const {
+template <typename ElemType>
+MyList<ElemType> MyList<ElemType>::subList(size_t pos, size_t len) const {
     if (pos >= size_ || pos > len) {
         std::cout << "subList error: wrong position!" << std::endl;
         exit(1);
     }
 
     int last = len > size_ - 1 ? size_ - 1 : len;
-    MyList newList;
+    MyList<ElemType> newList;
     Node* tmp = head_;
     int i = 0;
     for (; i < pos + 1; i++)
@@ -247,7 +263,8 @@ MyList MyList::subList(size_t pos, size_t len) const {
     return newList;
 }
 
-bool MyList::isCircular() {
+template <typename ElemType>
+bool MyList<ElemType>::isCircular() {
     Node* tmp = head_;
     Node* tmp1 = tmp;
     while (tmp1->next != nullptr && tmp1->next->next != nullptr) {
@@ -259,7 +276,8 @@ bool MyList::isCircular() {
     return false;
 }
 
-int MyList::loopStartAt() {
+template <typename ElemType>
+ElemType MyList<ElemType>::loopStartAt() {
     // if not circular, return -1
     if (!isCircular())
         return -1;
@@ -285,7 +303,8 @@ int MyList::loopStartAt() {
     return i;
 }
 
-void MyList::makeCircular(size_t pos) {
+template <typename ElemType>
+void MyList<ElemType>::makeCircular(size_t pos) {
     if (pos >= size_) {
         std::cout << "makeCircular error: out of range!" << std::endl;
         exit(1);
@@ -303,9 +322,10 @@ void MyList::makeCircular(size_t pos) {
     tmp1->next = tmp->next; 
 }
 
-MyList MyList::operator+(const MyList& list) const {
+template <typename ElemType>
+MyList<ElemType> MyList<ElemType>::operator+(const MyList<ElemType>& list) const {
     int len = list.size() > size_ ? size_ : list.size();
-    MyList sumList;
+    MyList<ElemType> sumList;
     int i;
     for (i = 0; i < len; i++)
         sumList.pushBack(list.getAt(i) + getAt(i));
@@ -313,8 +333,8 @@ MyList MyList::operator+(const MyList& list) const {
     return sumList;
 }
 
-
-void MyList::printList(size_t maxlen) const {
+template <typename ElemType>
+void MyList<ElemType>::printList(size_t maxlen) const {
     if (head_->next == nullptr) {
         std::cout << "printList error: empty list!" << std::endl;
         return;

@@ -6,11 +6,11 @@
 #include "myList.h"
 
 int main() {
-    MyList list1;
+    MyList<double> list1;
     size_t i;
 
     for (i = 0; i < 2000; i++) {
-        list1.pushFront(i);
+        list1.pushFront(i/4.0);
     }
  
     for (i = 0; i < 1990; i++) {
@@ -20,15 +20,15 @@ int main() {
     std::cout << "list size: " << list1.size() << std::endl;
     list1.printList(); 
 
-    MyList* list2 = new MyList(list1);
+    MyList<double>* list2 = new MyList<double>(list1);
     list2->sort(1);
     list2->printList();
     delete list2;
 
-    MyList list3 = list1.subList(0, 3) + list1;
+    MyList<double> list3 = list1.subList(0, 3) + list1;
     list3.printList();
 
-    MyList list4(1, 2);
+    MyList<int> list4(1, 2);
     list4.pushBack(4);
     list4.pushBack(4);
     list4.pushBack(5);

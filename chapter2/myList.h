@@ -5,18 +5,19 @@
 #ifndef MYLIST_H
 #define MYLIST_H
 
-struct Node {
-    int data;
-    Node* next;
-};
-
+template <typename ElemType>
 class MyList {
-  public:
+public:
+    struct Node {
+        ElemType data;
+        Node* next;
+    };
+
     MyList();
 
-    MyList(const MyList& list); 
+    MyList(const MyList<ElemType>& list); 
 
-    MyList(int data, size_t len);
+    MyList(ElemType data, size_t len);
 
     ~MyList();
 
@@ -24,19 +25,19 @@ class MyList {
 
     bool isEmpty() const;
 
-    int getAt(size_t index) const;
+    ElemType getAt(size_t index) const;
 
-    void setAt(size_t index, int data);
+    void setAt(size_t index, ElemType data);
 
-    void pushFront(int data);
+    void pushFront(ElemType data);
 
-    void pushBack(int data);
+    void pushBack(ElemType data);
 
-    int popFront();
+    ElemType popFront();
 
-    int popBack();
+    ElemType popBack();
 
-    void insertAt(size_t index, int data);
+    void insertAt(size_t index, ElemType data);
 
     void removeAt(size_t index);
 
@@ -44,21 +45,23 @@ class MyList {
 
     void sort(bool isAscend = true);
 
-    MyList subList(size_t pos = 0, size_t len = -1) const;
+    MyList<ElemType> subList(size_t pos = 0, size_t len = -1) const;
 
     bool isCircular();
 
-    int loopStartAt();
+    ElemType loopStartAt();
 
     void makeCircular(size_t pos = 0);
 
-    MyList operator+(const MyList& list) const; 
+    MyList<ElemType> operator+(const MyList<ElemType>& list) const; 
 
     void printList(size_t maxlen = -1) const;
       
-  private:
+private:
     Node* head_;
     int size_;
 };
+
+#include "myList.cpp"
 
 #endif
