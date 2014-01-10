@@ -20,6 +20,7 @@ int main() {
         myBST.recursiveRemove(i);
     myBST.preorderTraversal(std::cout);
     myBST.inorderTraversal(std::cout);
+    myBST.~BST();
     myBST.postorderTraversal(std::cout);
     return 0;
 }

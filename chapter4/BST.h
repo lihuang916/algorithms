@@ -41,6 +41,8 @@ public:
 
     void postorderTraversal(std::ostream& out) const;
 
+    bool isBalance() const;
+
     void balance();
 
 private:
@@ -51,6 +53,7 @@ private:
     void inorderAt(Node* root, std::ostream& out) const;
     void postorderAt(Node* root, std::ostream& out) const;
     void removeFrom(Node*& root, const ET& elem);
+    void deleteTree(Node*& root);
 };
 
 template <class ET>
@@ -58,8 +61,8 @@ inline BST<ET>::BST() : root_(nullptr), size_(0) { }
 
 template <class ET>
 BST<ET>::~BST() {
-
-
+    deleteTree(root_);
+    root_ = nullptr;
 }
 
 template <class ET>
@@ -246,8 +249,22 @@ void BST<ET>::postorderAt(Node* root, std::ostream& out) const {
 }
 
 template <class ET>
+bool BST<ET>::isBalance() const {
+       
+}
+
+template <class ET>
 void BST<ET>::balance() {
 
+}
+
+template <class ET>
+void BST<ET>::deleteTree(Node*& root) {
+    if (root != nullptr) {
+        deleteTree(root->left);
+        deleteTree(root->right);
+        delete root;
+    }
 }
 
 #endif
