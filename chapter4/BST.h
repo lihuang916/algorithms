@@ -8,6 +8,8 @@
 #include <ostream>
 #include <iostream>
 #include <cstdlib>
+#include <stack>
+#include <vector>
 
 template <class ET>
 class BST {
@@ -31,6 +33,8 @@ public:
 
     void insert(const ET& elem);
 
+    void insert(std::vector<ET>& elemVec);
+
     void remove(const ET& elem);
 
     void recursiveRemove(const ET& elem);
@@ -40,6 +44,12 @@ public:
     void inorderTraversal(std::ostream& out) const;
 
     void postorderTraversal(std::ostream& out) const;
+
+    void iterativePreorder(std::ostream& out) const;
+    
+    void iterativeInorder(std::ostream& out) const;
+    
+    void iterativePostorder(std::ostream& out) const;
 
     bool isBalance() const;
 
@@ -114,6 +124,13 @@ void BST<ET>::insert(const ET& elem) {
             parent->left = newNode;
     }
     size_++;
+}
+
+template <class ET>
+void BST<ET>::insert(std::vector<ET>& elemVec) {
+    int i;
+    for (i = 0; i < elemVec.size(); i++) 
+        insert(elemVec[i]);
 }
 
 template <class ET>
@@ -249,8 +266,98 @@ void BST<ET>::postorderAt(Node* root, std::ostream& out) const {
 }
 
 template <class ET>
-bool BST<ET>::isBalance() const {
+void BST<ET>::iterativePreorder(std::ostream& out) const {
+    std::stack<Node*> nodeStack;
+    nodeStack.push(root_);
+    
+    out << "Iterative preorder traversal:" << std::endl;
+    while (!nodeStack.empty()) {
+        Node* top = nodeStack.top();
+        if (top) {
+            out << top->elem << ", ";
+            nodeStack.pop();
+            nodeStack.push(top->right);
+            nodeStack.push(top->left);
+        }
+        else
+            nodeStack.pop();
+    }
+    out << std::endl;
+}
+
+template <class ET>
+void BST<ET>::iterativeInorder(std::ostream& out) const {
+    std::stack<Node*> nodeStack;
+
+    out << "Iterative inorder traversal:" << std::endl;
+    nodeStack.push(root_);
+    while (!nodeStack.empty()) {
+        Node* top = nodeStack.top();
+        if (top) {
+            while (top) {
+                top = top->left;
+                nodeStack.push(top);
+            }
+        }
+        else {
+            nodeStack.pop();
+            if (nodeStack.empty())
+                break;
+            top = nodeStack.top();
+            nodeStack.pop();
+            out << top->elem << ", ";
+            nodeStack.push(top->right);
+        }
+    }
+    out << std::endl;
+}
+
+template <class ET>
+void BST<ET>::iterativePostorder(std::ostream& out) const {
+    std::stack<Node*> nodeStack;
+    Node* prev;
+
+    out << "Iterative postorder traversal:" << std::endl;
+    nodeStack.push(root_);
+    prev = nullptr;
+    Node* tmp = root_;
+    while (tmp->left) {
+        nodeStack.push(tmp->left);
+        tmp = tmp->left;
+    }
+    while (!nodeStack.empty()) {
+        Node* top = nodeStack.top();
+        if (!top) {
+            nodeStack.pop();
+            prev = nodeStack.top();
+            nodeStack.pop();
+            out << prev->elem << ", ";
+            continue;
+        }
        
+        if (prev && prev->right == top) {
+            while (top->left) {
+                nodeStack.push(top->left);
+                top = top->left;
+            }
+        }
+
+        if (prev == top->right) {
+            out << top->elem << ", ";
+            prev = nodeStack.top();
+            nodeStack.pop();
+        }
+        else {
+            prev = top;
+            nodeStack.push(top->right);
+        }
+    }
+    out << std::endl;
+}
+
+template <class ET>
+bool BST<ET>::isBalance() const {
+    
 }
 
 template <class ET>
