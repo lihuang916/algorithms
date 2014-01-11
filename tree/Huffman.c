@@ -44,9 +44,13 @@ void destroy_stack(stack_t *s) {
 
 void push(stack_t *s, stack_data_t val) {
     s->arr[++(s->top)] = val;
-    if (s->top == s->maxsize - 1) {
+    if (s->top >= s->maxsize - 1) {
         s->maxsize *= 2;
-        s->arr = (stack_data_t*) realloc(s->arr, s->maxsize);
+        s->arr = (stack_data_t*) realloc(s->arr, s->maxsize * sizeof(stack_data_t));
+        if (s->arr == NULL) {
+            printf("Error reallocating memory!\n");
+            exit(1);
+        }
     }
 }
 
@@ -128,8 +132,9 @@ void inorder(node_t *root, stack_t *s) {
     if (root == NULL) 
         return;
     if (root->left == NULL && root->right == NULL) {
-        printf("%c: \t", root->data);
+        printf("%c:\t", root->data);
         print_stack(s);
+        return;
     }
     if (root->left != NULL) {
         push(s, 0);
@@ -150,6 +155,7 @@ void print_encoding(node_t *root) {
     // Recursively traverse Huffman tree and print encoding results
     inorder(root, code_stack);
     destroy_stack(code_stack);
+    free(code_stack);
 }
 
 data_t *decode(int code[]) {
@@ -158,12 +164,47 @@ data_t *decode(int code[]) {
     return msg;
 }
 
-int main(int argc, char *argv[]) {
-    char c[] = "abcdef";
-    double w[] = {0.3, 0.2, 0.2, 0.15, 0.1, 0.05};
-    node_t *huffman_tree = build_huffman_tree(c, w, 5);
-    print_encoding(huffman_tree);
+void encode_file(FILE* f) {
+    int char_freq[256];
+    double w[256];
+    char chars_to_encode[256];
+    char c;
+    int file_size = 0;
+    int num_chars_to_encode = 0;
+    int i;
 
+    memset(char_freq, 0, 256 * sizeof(int));
+    memset(w, 0, 256 * sizeof(double));
+    memset(chars_to_encode, 0, 256);
+    while ((c = fgetc(f)) != EOF) {
+        char_freq[(int)c]++;
+        file_size++;
+    }
+    
+    for (i = 0; i < 256; i++) {
+        if (char_freq[i]) {
+            chars_to_encode[num_chars_to_encode] = i;
+            w[num_chars_to_encode] = char_freq[i] / (double) file_size;
+            num_chars_to_encode++;
+        }
+    }
+
+    printf("Weight\n");
+    for (i = 0; i < num_chars_to_encode; i++)
+        printf("%c:\t%f\n", chars_to_encode[i], w[i]);
+
+    node_t *huffman_tree = build_huffman_tree(chars_to_encode, w, num_chars_to_encode);
+    print_encoding(huffman_tree);
+}
+
+int main(int argc, char *argv[]) {
+    if (argc < 2) {
+        printf("Usage: Huffman <filename>\n");
+        exit(1);
+    }
+    
+    FILE* fp = fopen(argv[1], "r");
+    encode_file(fp);
     return 0;
 }
 
