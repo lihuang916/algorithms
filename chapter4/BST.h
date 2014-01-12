@@ -10,6 +10,8 @@
 #include <cstdlib>
 #include <stack>
 #include <vector>
+#include <list>
+#include <queue>
 
 template <class ET>
 class BST {
@@ -23,11 +25,15 @@ private:
 public:
     BST();
 
+    BST(const std::vector<ET>& vec);
+
     ~BST();
 
     int size() const;
     
     bool isEmpty() const;
+
+    int height() const;
 
     bool search(const ET& elem) const;
 
@@ -55,19 +61,41 @@ public:
 
     void balance();
 
+    std::vector<std::list<ET> *>* createLists() const;
+
+    ET findFirstCommonAncestor(const ET& elem1, const ET& elem2) const;
+
 private:
     Node* root_;
     int size_;
 
+    int getHeight(Node* root) const;
+
+    Node* searchNode(Node* root, const ET& elem) const;
+
+    std::vector<Node*>* searchPath(const ET& elem) const;
+    
     void preorderAt(Node* root, std::ostream& out) const;
+    
     void inorderAt(Node* root, std::ostream& out) const;
+    
     void postorderAt(Node* root, std::ostream& out) const;
+    
     void removeFrom(Node*& root, const ET& elem);
+    
     void deleteTree(Node*& root);
+    
+    Node* buildTree(const std::vector<ET>& vec, int begin, int end);
 };
 
 template <class ET>
 inline BST<ET>::BST() : root_(nullptr), size_(0) { }
+
+template <class ET>
+BST<ET>::BST(const std::vector<ET>& vec) {
+    root_ = buildTree(vec, 0, vec.size() - 1);
+    size_ = vec.size();
+}
 
 template <class ET>
 BST<ET>::~BST() {
@@ -86,17 +114,56 @@ bool BST<ET>::isEmpty() const {
 }
 
 template <class ET>
+int BST<ET>::height() const {
+    return getHeight(root_);   
+}
+
+template <class ET>
+int BST<ET>::getHeight(Node* root) const {
+    if (root == nullptr)
+        return 0;
+    
+    int a = getHeight(root->left);
+    int b = getHeight(root->right);
+    return a > b ? a + 1 : b + 1;
+}
+
+template <class ET>
 bool BST<ET>::search(const ET& elem) const {
-    Node* tmp = root_;
+   return searchNode(root_, elem) != nullptr;
+}
+
+template <class ET>
+class BST<ET>::Node* BST<ET>::searchNode(Node* root, const ET& elem) const {
+    Node* tmp = root;
     while (tmp != nullptr) {
         if (tmp->elem == elem)
-            return true;
+            return tmp;
         if (tmp->elem < elem)
             tmp = tmp->right;
         else
             tmp = tmp->left;
     }
-    return false;
+    
+    return nullptr;
+}
+
+template <class ET>
+std::vector<class BST<ET>::Node*>* BST<ET>::searchPath(const ET& elem) const {
+    std::vector<Node*>* path = new std::vector<Node*>;
+    Node* tmp = root_;
+    while (tmp != nullptr) {
+        path->push_back(tmp);
+        if (tmp->elem == elem)
+            return path;
+        if (tmp->elem < elem)
+            tmp = tmp->right;
+        else
+            tmp = tmp->left;
+    }
+    
+    delete path;
+    return nullptr;
 }
 
 template <class ET>
@@ -321,7 +388,7 @@ void BST<ET>::iterativePostorder(std::ostream& out) const {
     nodeStack.push(root_);
     prev = nullptr;
     Node* tmp = root_;
-    while (tmp->left) {
+    while (tmp && tmp->left) {
         nodeStack.push(tmp->left);
         tmp = tmp->left;
     }
@@ -329,6 +396,8 @@ void BST<ET>::iterativePostorder(std::ostream& out) const {
         Node* top = nodeStack.top();
         if (!top) {
             nodeStack.pop();
+            if (nodeStack.empty())
+                break;
             prev = nodeStack.top();
             nodeStack.pop();
             out << prev->elem << ", ";
@@ -357,12 +426,48 @@ void BST<ET>::iterativePostorder(std::ostream& out) const {
 
 template <class ET>
 bool BST<ET>::isBalance() const {
-    
+    int maxDepth = 0;
+    int minDepth = 0;
+
+    std::stack<Node*> nodeStack;
+    std::stack<int> depthStack;
+    nodeStack.push(root_);
+    depthStack.push(1);
+    while (!nodeStack.empty()) {
+        Node* top = nodeStack.top();
+        int dep = depthStack.top();
+        if (top) {
+            nodeStack.pop();
+            depthStack.pop();
+            nodeStack.push(top->right);
+            depthStack.push(dep + 1);
+            nodeStack.push(top->left);
+            depthStack.push(dep + 1);
+        }
+        else {
+            if (maxDepth == 0) {
+                maxDepth = dep;
+                minDepth = dep;
+            }
+            else {
+                if (dep > maxDepth)
+                    maxDepth = dep;
+                if (dep < minDepth)
+                    minDepth = dep;
+                if (maxDepth - minDepth > 1)
+                    return false;
+            }
+            nodeStack.pop();
+            depthStack.pop();
+        }
+    }
+
+    return true;
 }
 
 template <class ET>
 void BST<ET>::balance() {
-
+    
 }
 
 template <class ET>
@@ -372,6 +477,85 @@ void BST<ET>::deleteTree(Node*& root) {
         deleteTree(root->right);
         delete root;
     }
+}
+
+template <class ET>
+class BST<ET>::Node* BST<ET>::buildTree(const std::vector<ET>& vec, int begin, int end) {
+    if (begin > end)
+        return nullptr;
+    if (begin == end) {
+        Node* newNode = new Node;
+        newNode->elem = vec[begin];
+        newNode->left = nullptr;
+        newNode->right = nullptr;
+        return newNode;
+    }
+    else {
+        int mid = (begin + end) / 2;
+        Node* newNode = new Node;
+        newNode->elem = vec[mid];
+        newNode->left = buildTree(vec, begin, mid - 1);
+        newNode->right = buildTree(vec, mid + 1, end);
+        return newNode;
+    }
+}
+
+
+template <class ET>
+std::vector<std::list<ET> *>* BST<ET>::createLists() const {
+    std::vector<std::list<ET> *>* listVec = new std::vector<std::list<ET> *>;
+    std::queue<Node*> nodeQ;
+    int currLevel;
+    int nodesLeft;
+    int nextNodes;
+
+    nodeQ.push(root_);
+    currLevel = 0;
+    nodesLeft = 1;
+    nextNodes = 0;
+    std::list<ET>* lst = new std::list<ET>;
+    listVec->push_back(lst);
+    while (!nodeQ.empty()) {
+        Node* tmp = nodeQ.front();
+        nodeQ.pop();
+        listVec->at(currLevel)->push_back(tmp->elem);
+        if (tmp->left) {
+            nodeQ.push(tmp->left);
+            nextNodes++;
+        }
+        if (tmp->right) {
+            nodeQ.push(tmp->right);
+            nextNodes++;
+        }
+
+        nodesLeft--;
+        if (nodesLeft == 0 && !nodeQ.empty()) {
+            std::list<ET>* lst = new std::list<ET>;
+            listVec->push_back(lst);
+            nodesLeft = nextNodes;
+            nextNodes = 0;
+            currLevel++;
+        }
+    }
+
+    return listVec;
+}
+
+template <class ET>
+ET BST<ET>::findFirstCommonAncestor(const ET& elem1, const ET& elem2) const {
+    std::vector<Node*>* path1 = searchPath(elem1);  
+    ET ret;
+    if (path1 == nullptr) {
+        std::cout << "elem1 not found!" << std::endl;
+        return ret;
+    }
+    while (!path1->empty()) {
+        if (searchNode(path1->back(), elem2))
+            return path1->back()->elem;
+        path1->pop_back();
+    }
+   
+    return ret;
 }
 
 #endif
