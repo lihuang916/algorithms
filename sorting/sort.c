@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define MAXINPUTSIZE 1000000
+#define MAXINPUTSIZE 50000
 
 // selection sort 
 void selectionSort(int arr[], int start, int end) {
@@ -26,7 +26,6 @@ void selectionSort(int arr[], int start, int end) {
         arr[i] = min;
     }
 }
-
 
 // bubble sort
 void bubbleSort(int arr[], int start, int end) {
@@ -94,7 +93,6 @@ void percolate(int arr[], int start, int end) {
     }
 }
 
-
 void heapSort(int arr[], int start, int end) {
     // first heapify the array
     int i;
@@ -113,8 +111,6 @@ void heapSort(int arr[], int start, int end) {
     }
 }
 
-
-
 // quick sort
 // helper function: swap
 void swap(int* x, int* y) {
@@ -123,13 +119,8 @@ void swap(int* x, int* y) {
     *y = tmp;
 }
 
-// recursive version
-void recursiveQsort(int arr[], int start, int end) {
-    if (end - start <= 120) {
-        insertionSort(arr, start, end);
-        return;
-    }
-     
+// helper function: partition
+int partition(int arr[], int start, int end) {
     int pivot, pivotVal;
     int mid = (start + end) / 2;
     if (arr[start] < arr[end]) {
@@ -156,31 +147,82 @@ void recursiveQsort(int arr[], int start, int end) {
     while (1) {
         while (arr[left] <= pivotVal) left++;
         while (arr[right] > pivotVal) right--;
-        
         if (left > right)
             break;
         
         swap(&arr[left], &arr[right]);
     }
-
     swap(&arr[right], &arr[start]);
-    if (right <= mid) {
-        recursiveQsort(arr, start, right - 1);
-        recursiveQsort(arr, right + 1, end);
+    return right;
+}
+
+// recursive version
+void recursiveQsort(int arr[], int start, int end) {
+    if (end - start <= 120) {
+        insertionSort(arr, start, end);
+        return;
+    }
+     
+    int pivot = partition(arr, start, end);
+    if (pivot <= (start + end) / 2) {
+        recursiveQsort(arr, start, pivot - 1);
+        recursiveQsort(arr, pivot + 1, end);
     }
     else {
-        recursiveQsort(arr, start, right - 1);
-        recursiveQsort(arr, right + 1, end);
+        recursiveQsort(arr, pivot + 1, end);
+        recursiveQsort(arr, start, pivot - 1);    
     }
 }
 
-// non-recursive version
-void qSort(int arr[], int start, int end) {
-    
+// iterative version
+void iterativeQsort(int arr[], int start, int end) {
+    int* stack = (int*) malloc(2 * (end - start) * sizeof(int));
+    int top = -1;
+    int left, right, pivot;
 
+    stack[++top] = start;
+    stack[++top] = end;
+    while (top > 0) {
+        right = stack[top--];
+        left = stack[top--];
+        if (left >= right)
+            continue;
+        pivot = partition(arr, left, right);
+        stack[++top] = left;
+        stack[++top] = pivot - 1;
+        stack[++top] = pivot + 1;
+        stack[++top] = right;
+    }
 }
 
 // merge sort
+// helper function: merge 
+void merge(int arr[], int start, int end, int interval) {
+    int i = start;
+    int* c = (int*) malloc(2 * interval * sizeof(int));
+    while (i + interval <= end) {
+        int left = i;
+        int right = i + interval;
+        int j = 0;
+        int rightend = i + 2 * interval > end ? end + 1 : i + 2 * interval;
+        while (left < i + interval || right < rightend) {
+            if ((left < i + interval && arr[left] < arr[right] )|| right >= rightend) 
+                c[j++] = arr[left++];
+            else 
+                c[j++] = arr[right++];
+        }
+       
+        for (j = 0; j < 2 * interval && i + j <= end; j++) 
+            arr[i + j] = c[j];
+        i += 2 * interval;
+    } 
+}
+
+void mergeSort(int arr[], int start, int end) {
+    int interval = 1;
+    for (; interval < end - start + 1; interval *= 2) 
+        merge(arr, start, end, interval);
+}
 
 
 int main(int argc, char* argv[]) {
@@ -198,18 +240,19 @@ int main(int argc, char* argv[]) {
     int* arr = (int*) malloc(MAXINPUTSIZE * sizeof(int));
     int i = 0;
     while (i < MAXINPUTSIZE && fscanf(ifp, "%d", &arr[i++]) != NULL);
-   
+    fclose(ifp);
+    
     clock_t start = clock();
-    recursiveQsort(arr, 0, MAXINPUTSIZE - 1);
+    mergeSort(arr, 0, MAXINPUTSIZE - 1);
     clock_t end = clock();
     double elapsed_time = (end - start) / (double) CLOCKS_PER_SEC;
-
+    printf("Sort time: %f\n", elapsed_time);
+    
+    
     FILE* ofp = fopen("output", "w");
-
-    printf("Sorting time: %f\n", elapsed_time);
     for (i = 0; i < MAXINPUTSIZE; i++)
         fprintf(ofp, "%d, ", arr[i]);
-    // printf("\n");
+    printf("\n");
 
     return 0;
 }
