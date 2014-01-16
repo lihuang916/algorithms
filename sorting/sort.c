@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define MAXINPUTSIZE 10000000
+#define MAXINPUTSIZE 1000000
 
 // selection sort 
 void selectionSort(int arr[], int start, int end) {
@@ -116,11 +116,69 @@ void heapSort(int arr[], int start, int end) {
 
 
 // quick sort
+// helper function: swap
+void swap(int* x, int* y) {
+    int tmp = *x;
+    *x = *y;
+    *y = tmp;
+}
 
+// recursive version
+void recursiveQsort(int arr[], int start, int end) {
+    if (end - start <= 120) {
+        insertionSort(arr, start, end);
+        return;
+    }
+     
+    int pivot, pivotVal;
+    int mid = (start + end) / 2;
+    if (arr[start] < arr[end]) {
+        if (arr[end] < arr[mid]) 
+            pivot = end;
+        else if (arr[start] > arr[mid])
+            pivot = start;
+        else
+            pivot = mid;
+    }
+    else {
+        if (arr[start] < arr[mid]) 
+            pivot = start;
+        else if (arr[end] > arr[mid])
+            pivot = end;
+        else 
+            pivot = mid;
+    }
+    pivotVal = arr[pivot];
+    swap(&arr[pivot], &arr[start]);
+    int left = start + 1;
+    int right = end;
+  
+    while (1) {
+        while (arr[left] <= pivotVal) left++;
+        while (arr[right] > pivotVal) right--;
+        
+        if (left > right)
+            break;
+        
+        swap(&arr[left], &arr[right]);
+    }
 
-// shell sort
+    swap(&arr[right], &arr[start]);
+    if (right <= mid) {
+        recursiveQsort(arr, start, right - 1);
+        recursiveQsort(arr, right + 1, end);
+    }
+    else {
+        recursiveQsort(arr, start, right - 1);
+        recursiveQsort(arr, right + 1, end);
+    }
+}
 
+// non-recursive version
+void qSort(int arr[], int start, int end) {
+    
 
+}
 
 // merge sort
 
@@ -142,7 +200,7 @@ int main(int argc, char* argv[]) {
     while (i < MAXINPUTSIZE && fscanf(ifp, "%d", &arr[i++]) != NULL);
    
     clock_t start = clock();
-    heapSort(arr, 0, MAXINPUTSIZE - 1);
+    recursiveQsort(arr, 0, MAXINPUTSIZE - 1);
     clock_t end = clock();
     double elapsed_time = (end - start) / (double) CLOCKS_PER_SEC;
 
