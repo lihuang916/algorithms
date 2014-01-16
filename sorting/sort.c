@@ -5,7 +5,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
+#define MAXINPUTSIZE 10000000
 
 // selection sort 
 void selectionSort(int arr[], int start, int end) {
@@ -66,6 +68,51 @@ void insertionSort(int arr[], int start, int end) {
 }
 
 // heap and heap sort
+// helper function: percolate(int arr[], int start, int end) 
+void percolate(int arr[], int start, int end) {
+    int curr = start;
+    int left = 2 * curr + 1;
+    while (left <= end) {
+        int next;
+        if (left < end) {
+            if (arr[left] > arr[left + 1]) 
+                next = left;
+            else 
+                next = left + 1;
+        }
+        else 
+            next = left;
+
+        if (arr[curr] < arr[next]) {
+            int tmp = arr[curr];
+            arr[curr] = arr[next];
+            arr[next] = tmp;
+            curr = next; 
+            left = 2 * curr + 1;
+        }
+        else break;
+    }
+}
+
+
+void heapSort(int arr[], int start, int end) {
+    // first heapify the array
+    int i;
+    for (i = end; i >= 0; i--) {
+        percolate(arr, i, end);
+    }
+
+    // then sort and percolate
+    for (i = end; i > 0; i--) {
+        int tmp = arr[0];
+        arr[0] = arr[i];
+        arr[i] = tmp;
+        
+        // percolate
+        percolate(arr, 0, i - 1);
+    }
+}
+
 
 
 // quick sort
@@ -78,15 +125,33 @@ void insertionSort(int arr[], int start, int end) {
 // merge sort
 
 
-int main() {
-    int arr[] = {6, 54, 2, 80, 15, 23, 52, 1, 100, 77, 49, 20};
+int main(int argc, char* argv[]) {
+    if (argc < 2) {
+        printf("Usage: ./test <inputDataFile>\n");
+        exit(1);
+    }
     
-    insertionSort(arr, 0, 11);
-    int i;
-    printf("sorted list:\n");
-    for (i = 0; i < 12; i++)
-        printf(" %d,", arr[i]);
-    printf("\n");
+    FILE* ifp = fopen(argv[1], "r");
+    if (ifp == NULL) {
+        fprintf(stderr, "Can't open input file!\n");
+        exit(1);
+    }
+
+    int* arr = (int*) malloc(MAXINPUTSIZE * sizeof(int));
+    int i = 0;
+    while (i < MAXINPUTSIZE && fscanf(ifp, "%d", &arr[i++]) != NULL);
+   
+    clock_t start = clock();
+    heapSort(arr, 0, MAXINPUTSIZE - 1);
+    clock_t end = clock();
+    double elapsed_time = (end - start) / (double) CLOCKS_PER_SEC;
+
+    FILE* ofp = fopen("output", "w");
+
+    printf("Sorting time: %f\n", elapsed_time);
+    for (i = 0; i < MAXINPUTSIZE; i++)
+        fprintf(ofp, "%d, ", arr[i]);
+    // printf("\n");
 
     return 0;
 }
