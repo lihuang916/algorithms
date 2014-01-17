@@ -34,7 +34,7 @@ typedef struct stack {
 void init_stack(stack_t *s) {
     s->top = -1;
     s->maxsize = INITIALSIZE;
-    s->arr = (stack_data_t*) malloc(INITIALSIZE * sizeof(stack_data_t));
+    s->arr = malloc(INITIALSIZE * sizeof(stack_data_t));
 }
 
 void destroy_stack(stack_t *s) {
@@ -46,7 +46,7 @@ void push(stack_t *s, stack_data_t val) {
     s->arr[++(s->top)] = val;
     if (s->top >= s->maxsize - 1) {
         s->maxsize *= 2;
-        s->arr = (stack_data_t*) realloc(s->arr, s->maxsize * sizeof(stack_data_t));
+        s->arr = realloc(s->arr, s->maxsize * sizeof(stack_data_t));
         if (s->arr == NULL) {
             printf("Error reallocating memory!\n");
             exit(1);
@@ -79,10 +79,10 @@ void print_stack(stack_t *s) {
 
 node_t *build_huffman_tree(data_t s[], double weight[], int len) {
     // First, build a one-node tree for each data_t and save in an array
-    entry_t *tree_list = (entry_t*) malloc(len * sizeof(entry_t));    
+    entry_t *tree_list = malloc(len * sizeof *tree_list);    
     int i;
     for (i = 0; i < len; i++) {
-        node_t* new_node = (node_t*) malloc(sizeof(node_t));
+        node_t* new_node = malloc(sizeof *new_node);
         new_node->data = s[i];
         new_node->left = NULL;
         new_node->right = NULL;
@@ -91,8 +91,8 @@ node_t *build_huffman_tree(data_t s[], double weight[], int len) {
     }
 
     // Merge subtrees for n-1 times
-    bool *used = (bool*) malloc(len * sizeof(bool));
-    memset(used, 0, len * sizeof(bool));
+    bool *used = malloc(len * sizeof *used);
+    memset(used, 0, len * sizeof *used);
     int final_index;
     for (i = 0; i < len - 1; i++) {
         double min1 = 2.0, min2 = 2.0;
@@ -114,7 +114,7 @@ node_t *build_huffman_tree(data_t s[], double weight[], int len) {
             
         // Merge entry at index2 to entry at index1
         tree_list[index2].wt = min1 + min2;
-        node_t *new_node = (node_t*) malloc(sizeof(node_t));
+        node_t *new_node = malloc(sizeof *new_node);
         new_node->left = tree_list[index1].subtree;
         new_node->right = tree_list[index2].subtree;
         tree_list[index2].subtree = new_node;
@@ -149,7 +149,7 @@ void inorder(node_t *root, stack_t *s) {
 }
 
 void print_encoding(node_t *root) {
-    stack_t *code_stack = (stack_t*) malloc(sizeof(stack_t));
+    stack_t *code_stack = malloc(sizeof *code_stack);
     init_stack(code_stack);
     
     // Recursively traverse Huffman tree and print encoding results
@@ -159,7 +159,7 @@ void print_encoding(node_t *root) {
 }
 
 data_t *decode(int code[]) {
-    data_t *msg = (data_t*) malloc(1000);
+    data_t *msg = malloc(1000);
     
     return msg;
 }

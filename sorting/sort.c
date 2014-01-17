@@ -176,7 +176,7 @@ void recursiveQsort(int arr[], int start, int end) {
 
 // iterative version
 void iterativeQsort(int arr[], int start, int end) {
-    int* stack = (int*) malloc(2 * (end - start) * sizeof(int));
+    int* stack = malloc(2 * (end - start) * sizeof *stack);
     int top = -1;
     int left, right, pivot;
 
@@ -193,13 +193,14 @@ void iterativeQsort(int arr[], int start, int end) {
         stack[++top] = pivot + 1;
         stack[++top] = right;
     }
+    free(stack);
 }
 
 // merge sort
 // helper function: merge 
 void merge(int arr[], int start, int end, int interval) {
     int i = start;
-    int* c = (int*) malloc(2 * interval * sizeof(int));
+    int* c = malloc(2 * interval * sizeof *c);
     while (i + interval <= end) {
         int left = i;
         int right = i + interval;
@@ -216,6 +217,7 @@ void merge(int arr[], int start, int end, int interval) {
             arr[i + j] = c[j];
         i += 2 * interval;
     } 
+    free(c);
 }
 
 void mergeSort(int arr[], int start, int end) {
@@ -237,7 +239,7 @@ int main(int argc, char* argv[]) {
         exit(1);
     }
 
-    int* arr = (int*) malloc(MAXINPUTSIZE * sizeof(int));
+    int* arr = malloc(MAXINPUTSIZE * sizeof *arr);
     int i = 0;
     while (i < MAXINPUTSIZE && fscanf(ifp, "%d", &arr[i++]) != NULL);
     fclose(ifp);
