@@ -5,6 +5,8 @@
 
 #include <stdio.h>
 #include <math.h>
+#include <stdlib.h>
+#include <string.h>
 
 // 5.1 setbits
 int setbits(int N, int M, int i, int j) {
@@ -18,7 +20,8 @@ void toBinary(const char *c) {
     int int_part;
     char binary[64], binary1[64];
     int i, j;
-
+    
+    i = 0;
     sscanf(c, "%lf", &a);
     int_part = (int) a;
     while (int_part >= 1) {
