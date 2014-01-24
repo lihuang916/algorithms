@@ -6,7 +6,9 @@
 #include <fstream>
 #include <string>
 #include <cstring>
-
+#include <vector>
+#include <map>
+#include <set>
 
 // 9-1 merge two sorted arrays
 void merge(int A[], int sA, int B[], int sB) {
@@ -31,7 +33,7 @@ void merge(int A[], int sA, int B[], int sB) {
 // 9-2 sort an array of strings so that anagrams are next to each other
 // version 1. Brute force search and compare
 // helper function: isAnagram
-bool isAnagram(const string& s1, const string& s2) {
+bool isAnagram(const std::string& s1, const std::string& s2) {
     if (s1.size() != s2.size())
         return false; 
     
@@ -49,20 +51,52 @@ bool isAnagram(const string& s1, const string& s2) {
     return true;
 }
 
-void bruteForceAnagram(string s[], int size) {
+void bruteForceAnagram(std::vector<std::string>& svec) {
     int i, j;
-    for (i = 0; i < size - 1; i++) {
-        for (j = i; j < size; j++) {
-            if (isAnagram(s[i], s[j]) && j > i + 1) {
-                string tmp = s[i];
-                s[i] = s[j];
-                s[j] = tmp;
+    for (i = 0; i < svec.size() - 1; i++) {
+        for (j = i + 1; j < svec.size(); j++) {
+            if (isAnagram(svec[i], svec[j])) {
+                i++;
+                std::string tmp = svec[i];
+                svec[i] = svec[j];
+                svec[j] = tmp;
             }
         }
     }
 }
 
+// 9-2 version 2. Use hash function
+void hashAnagram(std::vector<std::string>& sv) {
+    // build up a map from each lower case character to a prime number
+    int primes[] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101};
+    std::map<int, int> pmap;
+    int i;
+    for (i = 0; i < 26; i++)
+        pmap['a' + i] = primes[i];
 
+    std::map<long long, std::set<std::string>* > anamap;
+    // compute hash value of each string in the string vector
+    for (i = 0; i < sv.size(); i++) {
+        int j;
+        long long val = 1;
+        for (j = 0; j < sv[i].size(); j++) 
+            val *= pmap[sv[i][j]];
+        
+        if (anamap[val] == nullptr) {
+            std::set<std::string>* s = new std::set<std::string>();
+            s->insert(sv[i]);
+            anamap[val] = s;
+        } 
+        else 
+            anamap[val]->insert(sv[i]);
+    }
+    
+    for (auto &x : anamap) {
+        for (auto &y : *x.second)
+            std::cout << y << ", ";
+    }
+    std::cout << std::endl;
+}
 
 int main() {
     int A[30] = {1, 3, 5, 6, 9, 10, 24, 56, 79, 100};
@@ -79,14 +113,19 @@ int main() {
         std::cout << "Input file can not be opened!" << std::endl;
         return 1;
     }
-        
-    ofstream outputFile("strarr.output");
-    if (!outputFile.is_open()) {
-        std::cout << "Output file can not be opened!" << std::endl;
-        return 1;
-    }
-
-
-
+    
+    std::vector<std::string> sv;
+    std::string str;
+    while (std::getline(inputFile, str))
+        sv.push_back(str);
+    
+    hashAnagram(sv);
+    bruteForceAnagram(sv);
+    std::cout << "9-2 Anagrams" << std::endl;
+    for (auto &s : sv)
+        std::cout << s << ", ";
+    std::cout << std::endl;
+    
+    
     return 0;
 }
