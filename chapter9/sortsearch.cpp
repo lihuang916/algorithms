@@ -209,6 +209,48 @@ void searchMatrix(int (*A)[5], int val, int* row, int* col, int ulRow, int ulCol
 }
 
 // 9-7 Human tower. Longest increasing subsequence
+// helper function object: compare
+struct Comp {
+    bool operator() (std::pair<int, int>& p1, std::pair<int, int>& p2) {
+	return p1.first < p2.first;
+    }
+} compare;
+
+void humanTower(std::vector<std::pair<int, int> >& people) {
+    // sort people by height
+    std::sort(people.begin(), people.end(), compare);
+
+    //find the longest increasing subsequence in weights
+    int i;
+    int* visited = new int[people.size()];
+    memset(visited, 0, people.size() * sizeof *visited);
+    std::vector<int>* longestSub = new std::vector<int>();
+    for (i = 0; i < people.size(); i++) {
+	int j;
+	if (visited[i])
+	    continue;
+	std::vector<int>* curr = new std::vector<int>();
+	curr->push_back(i);
+	for (j = i + 1; j < people.size(); j++) {
+	    if (people[j].second >= people[curr->back()].second) {
+		visited[j] = 1;
+		curr->push_back(j);
+	    }
+	}
+	if (curr->size() > longestSub->size()) {
+	    delete longestSub;
+	    longestSub = curr;
+	    continue;
+	}
+	delete curr;
+    }
+
+    // print result
+    for (i = 0; i < longestSub->size(); i++) {
+	std::cout << people[(*longestSub)[i]].first << ", " << people[(*longestSub)[i]].second << std::endl;
+    }
+}
+
 
 int main() {
     int A[30] = {1, 3, 5, 6, 9, 10, 24, 56, 79, 100};
@@ -230,7 +272,8 @@ int main() {
     std::string str;
     while (std::getline(inputFile, str))
         sv.push_back(str);
-    
+    inputFile.close();
+
     hashAnagram(sv);
     //bruteForceAnagram(sv);
     std::cout << "9-2 Anagrams" << std::endl;
@@ -252,5 +295,26 @@ int main() {
     int row, col;
     searchMatrix(M, 21, &row, &col, 0, 0, 4, 4);
     std::cout << "9-6 search matrix: " << row << ", " << col << std::endl;
+
+    std::cout << "9-7 human tower:" << std::endl;
+    std::pair<int, int> mypair;
+    std::vector<std::pair<int, int> > people;
+    inputFile.open("people");
+    if (!inputFile.is_open()) {
+	std::cout << "Input file cannot be opened!" << std::endl;
+	return 1;
+    }
+    while (!inputFile.eof()) {
+	inputFile >> mypair.first;
+	inputFile >> mypair.second;
+	people.push_back(mypair);
+    }
+    std::cout << "people: " << std::endl;
+    for (auto &i : people) {
+	std::cout << i.first << ", " << i.second << std::endl;
+    }
+    std::cout << std::endl;
+    humanTower(people);
+
     return 0;
 }
