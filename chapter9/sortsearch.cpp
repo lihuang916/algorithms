@@ -9,6 +9,7 @@
 #include <vector>
 #include <map>
 #include <set>
+#include <algorithm>
 
 // 9-1 merge two sorted arrays
 void merge(int A[], int sA, int B[], int sB) {
@@ -211,8 +212,8 @@ void searchMatrix(int (*A)[5], int val, int* row, int* col, int ulRow, int ulCol
 // 9-7 Human tower. Longest increasing subsequence
 // helper function object: compare
 struct Comp {
-    bool operator() (std::pair<int, int>& p1, std::pair<int, int>& p2) {
-	return p1.first < p2.first;
+    bool operator() (const std::pair<int, int>& p1, const std::pair<int, int>& p2) {
+	    return p1.first < p2.first;
     }
 } compare;
 
@@ -226,28 +227,28 @@ void humanTower(std::vector<std::pair<int, int> >& people) {
     memset(visited, 0, people.size() * sizeof *visited);
     std::vector<int>* longestSub = new std::vector<int>();
     for (i = 0; i < people.size(); i++) {
-	int j;
-	if (visited[i])
-	    continue;
-	std::vector<int>* curr = new std::vector<int>();
-	curr->push_back(i);
-	for (j = i + 1; j < people.size(); j++) {
-	    if (people[j].second >= people[curr->back()].second) {
-		visited[j] = 1;
-		curr->push_back(j);
-	    }
-	}
-	if (curr->size() > longestSub->size()) {
-	    delete longestSub;
-	    longestSub = curr;
-	    continue;
-	}
-	delete curr;
+        int j;
+        if (visited[i])
+            continue;
+        std::vector<int>* curr = new std::vector<int>();
+        curr->push_back(i);
+        for (j = i + 1; j < people.size(); j++) {
+            if (people[j].second >= people[curr->back()].second) {
+                visited[j] = 1;
+                curr->push_back(j);
+            }
+        }
+        if (curr->size() > longestSub->size()) {
+            delete longestSub;
+            longestSub = curr;
+            continue;
+        }
+        delete curr;
     }
 
     // print result
     for (i = 0; i < longestSub->size(); i++) {
-	std::cout << people[(*longestSub)[i]].first << ", " << people[(*longestSub)[i]].second << std::endl;
+	    std::cout << people[(*longestSub)[i]].first << ", " << people[(*longestSub)[i]].second << std::endl;
     }
 }
 
