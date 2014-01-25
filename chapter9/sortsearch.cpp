@@ -176,7 +176,7 @@ void searchMatrix(int (*A)[5], int val, int* row, int* col, int ulRow, int ulCol
     int midRow = (ulRow + lrRow) / 2;
     int midCol = (ulCol + lrCol) / 2;
 
-    if (ulRow > 4 || ulCol > 4 || lrRow < 0 || lrCol < 0 || ulRow > lrRow || ulCol > lrCol) {
+    if (ulRow > lrRow || ulCol > lrCol) {
         *row = -1;
         *col = -1;
         return;
@@ -208,6 +208,7 @@ void searchMatrix(int (*A)[5], int val, int* row, int* col, int ulRow, int ulCol
     }
 }
 
+// 9-7 Human tower. Longest increasing subsequence
 
 int main() {
     int A[30] = {1, 3, 5, 6, 9, 10, 24, 56, 79, 100};
@@ -249,7 +250,7 @@ int main() {
                   {16, 17, 18, 19, 20},
                   {21, 22, 23, 24, 25}};
     int row, col;
-    searchMatrix(M, 15, &row, &col, 0, 0, 4, 4);
+    searchMatrix(M, 21, &row, &col, 0, 0, 4, 4);
     std::cout << "9-6 search matrix: " << row << ", " << col << std::endl;
     return 0;
 }
