@@ -98,6 +98,117 @@ void hashAnagram(std::vector<std::string>& sv) {
     std::cout << std::endl;
 }
 
+// 9-3 search in a rotated sorted array
+// helper function: binarySearch
+template <typename ET>
+int binarySearch(const std::vector<ET>& v, const ET& elem, int start, int end) {
+    int loc;
+    
+    while (start <= end) {
+        loc = (start + end) / 2;
+        if (v[loc] == elem) 
+            return loc;
+        if (v[loc] > elem) 
+            end = loc - 1;
+        else 
+            start = loc + 1;
+    }
+    return -1;
+}
+
+int searchRotated(const std::vector<int>& vec, int val, int start, int end) {
+    int mid = (start + end) / 2;
+    if (start > end)
+        return -1;
+    if (vec[mid] == val)
+        return mid;
+    if (vec[start] <= vec[mid]) {
+        if (val < vec[mid] && val >= vec[start]) 
+            return binarySearch<int>(vec, val, start, mid - 1);
+        else
+            return searchRotated(vec, val, mid + 1, end);
+    }
+    else {
+        if (val > vec[mid] && val < vec[start])
+            return binarySearch<int>(vec, val, mid + 1, end);
+        else 
+            return searchRotated(vec, val, start, mid - 1);
+    }
+}
+
+// 9-4 sort 2GB file with one string per line
+// My opinion: since the file is large and the cost of moving strings around is high, 
+// it's better to choose a sorting algorithm that doesn't require much move.
+// Quicksort and heapsort is a good choice, mergesort is a bad choice
+
+// 9-5 search in an array of strings with empty strings
+int searchWithEmpty(const std::vector<std::string>& sv, const std::string& s) {
+    int start = 0;
+    int end = sv.size() - 1;
+    while (start <= end) {
+        int mid = (start + end) / 2;
+        int loc = mid;
+        while(sv[loc].empty() && loc < end) loc++;
+        if (loc == end) {
+            loc = mid;
+            while (sv[loc].empty() && loc > start) loc--;
+            if (loc == start) {
+                if (!sv[start].empty() && !sv[start].compare(s))
+                    return start;
+                else if (!sv[end].empty() && !sv[end].compare(s))
+                    return end;
+                else
+                    return -1;
+            }
+        }
+        if (!sv[loc].compare(s))
+            return loc;
+        if (sv[loc].compare(s) < 0)
+            start = loc + 1;
+        else
+            end = loc - 1;
+    }
+    return -1;
+}
+
+// 9-6 search an element in a matrix
+void searchMatrix(int (*A)[5], int val, int* row, int* col, int ulRow, int ulCol, int lrRow, int lrCol) {
+    int midRow = (ulRow + lrRow) / 2;
+    int midCol = (ulCol + lrCol) / 2;
+
+    if (ulRow > 4 || ulCol > 4 || lrRow < 0 || lrCol < 0 || ulRow > lrRow || ulCol > lrCol) {
+        *row = -1;
+        *col = -1;
+        return;
+    }
+
+    if (A[midRow][midCol] == val) {
+        *row = midRow;
+        *col = midCol;
+        return;
+    }
+
+    if (A[midRow][midCol] < val) {
+        searchMatrix(A, val, row, col, ulRow, midCol + 1, midRow, lrCol);
+        if (*row != -1 && *col != -1)
+            return;
+        searchMatrix(A, val, row, col, midRow + 1, midCol + 1, lrRow, lrCol);
+        if (*row != -1 && *col != -1)
+            return;
+        searchMatrix(A, val, row, col, midRow + 1, ulCol, lrRow, midCol);
+    }
+    else {
+        searchMatrix(A, val, row, col, ulRow, midCol, midRow - 1, lrCol);
+        if (*row != -1 && *col != -1)
+            return;
+        searchMatrix(A, val, row, col, ulRow, ulCol, midRow - 1, midCol - 1);
+        if (*row != -1 && *col != -1)
+            return;
+        searchMatrix(A, val, row, col, midRow, ulCol, lrRow, midCol - 1);
+    }
+}
+
+
 int main() {
     int A[30] = {1, 3, 5, 6, 9, 10, 24, 56, 79, 100};
     int B[] = {2, 4, 5, 7, 8, 25, 45, 46, 78, 101, 102};
@@ -120,12 +231,25 @@ int main() {
         sv.push_back(str);
     
     hashAnagram(sv);
-    bruteForceAnagram(sv);
+    //bruteForceAnagram(sv);
     std::cout << "9-2 Anagrams" << std::endl;
     for (auto &s : sv)
         std::cout << s << ", ";
     std::cout << std::endl;
     
-    
+    int C[] = {23, 35, 68, 99, 100, 1, 3, 5, 6, 14, 21};
+    std::vector<int> rot(C, C + sizeof(C) / sizeof(int));
+    std::cout << "9-3 search an rotated sorted array: " << searchRotated(rot, 5, 0, 10) << std::endl;
+
+    std::cout << "9-5 search with empty string: " << searchWithEmpty(sv, std::string("zzzz")) << std::endl;
+
+    int M[][5] = {{1, 2, 3, 4, 5}, 
+                  {6, 7, 8, 9, 10},
+                  {11, 12, 13, 14, 15},
+                  {16, 17, 18, 19, 20},
+                  {21, 22, 23, 24, 25}};
+    int row, col;
+    searchMatrix(M, 15, &row, &col, 0, 0, 4, 4);
+    std::cout << "9-6 search matrix: " << row << ", " << col << std::endl;
     return 0;
 }
