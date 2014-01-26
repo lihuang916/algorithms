@@ -115,6 +115,7 @@ void Hashmap<V>::remove(const std::string& key) {
             prev->next = tmp->next;
             delete tmp;
         }
+        size_--;
     }
 }
 
