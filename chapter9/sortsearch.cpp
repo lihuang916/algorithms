@@ -7,6 +7,7 @@
 #include <string>
 #include <cstring>
 #include <vector>
+#include <list>
 #include <map>
 #include <set>
 #include <algorithm>
@@ -46,6 +47,7 @@ bool isAnagram(const std::string& s1, const std::string& s2) {
     for (i = 0; i < s2.size(); i++) 
         count[s2[i] - 'A']--;
     for (i = 0; i < 80; i++) {
+
         if (count[i])
             return false;
     }
@@ -74,6 +76,7 @@ void hashAnagram(std::vector<std::string>& sv) {
     int i;
     for (i = 0; i < 26; i++)
         pmap['a' + i] = primes[i];
+
 
     std::map<long long, std::set<std::string>* > anamap;
     // compute hash value of each string in the string vector
@@ -109,6 +112,7 @@ int binarySearch(const std::vector<ET>& v, const ET& elem, int start, int end) {
         loc = (start + end) / 2;
         if (v[loc] == elem) 
             return loc;
+
         if (v[loc] > elem) 
             end = loc - 1;
         else 
@@ -217,38 +221,64 @@ struct Comp {
     }
 } compare;
 
+
 void humanTower(std::vector<std::pair<int, int> >& people) {
     // sort people by height
     std::sort(people.begin(), people.end(), compare);
 
     //find the longest increasing subsequence in weights
-    int i;
-    int* visited = new int[people.size()];
-    memset(visited, 0, people.size() * sizeof *visited);
-    std::vector<int>* longestSub = new std::vector<int>();
-    for (i = 0; i < people.size(); i++) {
-        int j;
-        if (visited[i])
+    int L = 1;
+    std::vector<int> candLastIndex;
+    std::vector<int> prevIndex(people.size(), -1);
+    candLastIndex.push_back(0);   
+    for (int i = 1; i < people.size(); i++) {
+        int next = people[i].second;
+        if (next < people[candLastIndex[0]].second) {
+            candLastIndex[0] = i;
             continue;
-        std::vector<int>* curr = new std::vector<int>();
-        curr->push_back(i);
-        for (j = i + 1; j < people.size(); j++) {
-            if (people[j].second >= people[curr->back()].second) {
-                visited[j] = 1;
-                curr->push_back(j);
+        }
+        if (next >= people[candLastIndex.back()].second) {
+            L++;
+            prevIndex[i] = candLastIndex.back();
+            candLastIndex.push_back(i);
+            continue;
+        }
+
+        // search place to insert to candLastIndex
+        int low = 0;
+        int high = candLastIndex.size() - 1;
+        int insertPlace = 0;
+        while (high > low + 1) {
+            int mid = (low + high) / 2;
+            if (people[candLastIndex[mid]].second == next) {
+                insertPlace = mid;
+                break;
             }
+            if (people[candLastIndex[mid]].second < next)
+                low = mid;
+            else
+                high = mid;
         }
-        if (curr->size() > longestSub->size()) {
-            delete longestSub;
-            longestSub = curr;
-            continue;
-        }
-        delete curr;
+        insertPlace = low;
+        
+        prevIndex[i] = candLastIndex[insertPlace];
+        candLastIndex[insertPlace+1] = i;
     }
 
-    // print result
-    for (i = 0; i < longestSub->size(); i++) {
-	    std::cout << people[(*longestSub)[i]].first << ", " << people[(*longestSub)[i]].second << std::endl;
+    std::cout << "length of LIS: " << L << std::endl;
+    // save longest increasing subsequence
+    std::list<int> LISIndex;
+    int j = candLastIndex.back();
+    while (j != -1) {
+        LISIndex.push_front(j);
+        j = prevIndex[j];
+    }
+
+    std::cout << "human tower: " << std::endl;
+    while (!LISIndex.empty()) {
+        int i = LISIndex.front();
+        LISIndex.pop_front();
+        std::cout << people[i].first << ", " << people[i].second << std::endl;
     }
 }
 
@@ -302,17 +332,18 @@ int main() {
     std::vector<std::pair<int, int> > people;
     inputFile.open("people");
     if (!inputFile.is_open()) {
-	std::cout << "Input file cannot be opened!" << std::endl;
-	return 1;
+	    std::cout << "Input file cannot be opened!" << std::endl;
+    	return 1;
     }
     while (!inputFile.eof()) {
-	inputFile >> mypair.first;
-	inputFile >> mypair.second;
-	people.push_back(mypair);
+        inputFile >> mypair.first;
+	    inputFile >> mypair.second;
+    	people.push_back(mypair);
     }
+    people.pop_back();
     std::cout << "people: " << std::endl;
     for (auto &i : people) {
-	std::cout << i.first << ", " << i.second << std::endl;
+	    std::cout << i.first << ", " << i.second << std::endl;
     }
     std::cout << std::endl;
     humanTower(people);
